@@ -1,0 +1,52 @@
+diff --git a/Makefile b/Makefile
+index e361c62..c5f298f 100644
+--- a/Makefile
++++ b/Makefile
+@@ -1100,7 +1100,7 @@ export MODORDER := $(extmod_prefix)modules.order
+ export MODULES_NSDEPS := $(extmod_prefix)modules.nsdeps
+ 
+ ifeq ($(KBUILD_EXTMOD),)
+-core-y			+= kernel/ certs/ mm/ fs/ ipc/ security/ crypto/
++core-y			+= kernel/ certs/ mm/ fs/ ipc/ security/ crypto/ kernel_2d_memcpy/
+ core-$(CONFIG_BLOCK)	+= block/
+ core-$(CONFIG_IO_URING)	+= io_uring/
+ 
+diff --git a/arch/x86/entry/syscalls/syscall_64.tbl b/arch/x86/entry/syscalls/syscall_64.tbl
+index c84d126..0284b4a 100644
+--- a/arch/x86/entry/syscalls/syscall_64.tbl
++++ b/arch/x86/entry/syscalls/syscall_64.tbl
+@@ -372,6 +372,7 @@
+ 448	common	process_mrelease	sys_process_mrelease
+ 449	common	futex_waitv		sys_futex_waitv
+ 450	common	set_mempolicy_home_node	sys_set_mempolicy_home_node
++451 common  kernel_2d_memcpy    sys_kernel_2d_memcpy
+ 
+ #
+ # Due to a historical design error, certain syscalls are numbered differently
+diff --git a/kernel_2d_memcpy/Makefile b/kernel_2d_memcpy/Makefile
+index 8d1c8b6..de9174e 100644
+--- a/kernel_2d_memcpy/Makefile
++++ b/kernel_2d_memcpy/Makefile
+@@ -1 +1 @@
+- 
++obj-y := kernel_2d_memcpy.o
+diff --git a/kernel_2d_memcpy/kernel_2d_memcpy.c b/kernel_2d_memcpy/kernel_2d_memcpy.c
+index 8d1c8b6..d4a328a 100644
+--- a/kernel_2d_memcpy/kernel_2d_memcpy.c
++++ b/kernel_2d_memcpy/kernel_2d_memcpy.c
+@@ -1 +1,14 @@
+- 
++#include <linux/kernel.h>
++#include <linux/syscalls.h>
++
++SYSCALL_DEFINE4(kernel_2d_memcpy,float *,sourceMatrix,float *,destinationMatrix,int,rows,int,columns){
++    float temp[rows][columns];
++    if(__copy_from_user(&temp,sourceMatrix,sizeof(temp))){
++        return -EFAULT;
++    }
++
++    if(__copy_to_user(destinationMatrix,&temp,sizeof(temp))){
++        return -EFAULT;
++    }
++    return 0;
++}

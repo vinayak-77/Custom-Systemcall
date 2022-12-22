@@ -1,0 +1,18 @@
+First created a directory "kernel_2d_memcpy".
+Created a c file "kernel_2d_memcpy" to implememt the syscall and then created a Makefile.
+Added the syscall number 451, syscall name("kernel_2d_memcpy") and sys_kernel_2d_memcpy in the sycall_64.tbl table inside the kernel folder.
+Added the syscall name ("kernel_2d_memcp/") to line number 1103 of the kernel Makefile.
+Created the diff.patch by initializing a git repo inside the orignal kernel.
+Compiled the custom kernel(kernel with the syscall) with the following commands :-
+
+make -j4
+make modules_install
+cp -v arch/x86/boot/bzImage boot/vmlinuz-linuxMySyscall
+mkinitcpio -k 5.19.8 -g /boot.initramfs-linuxMySyscall.img
+grub-mkconfig -o /boot/grub/grub.cfg
+
+Then rebooted the system to use the custom kernel.
+Created a test.c to test the syscall.
+The initial sourceMatrix was {{1.0,2.0,3.0},{4.0,5.0,6.0},{7.0,8.0,9.0},{10.0,11.0,12.0}}
+The initial destinationMatrix was {{1.0,1.0,2.0},{9.0,9.0,6.0},{8.0,8.0,9.0},{10.0,21.0,12.0}}.
+After using syscall(kernel_2d_memcpy,sourceMatrix,destinationMatrix,4,3), the destinationMatrix became a copy of the sourceMatrix and was printed. 
